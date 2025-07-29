@@ -1,0 +1,102 @@
+services:
+  # Banco de dados PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: taskshare-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: taskshare
+      POSTGRES_USER: taskshare_user
+      POSTGRES_PASSWORD: taskshare_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - taskshare-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskshare_user -d taskshare"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend da aplicação (desenvolvimento)
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: taskshare-backend-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://taskshare_user:taskshare_password@postgres:5432/taskshare
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 7d
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - taskshare-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run dev
+
+  # Backend da aplicação (produção)
+  app-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: taskshare-backend-prod
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://taskshare_user:taskshare_password@postgres:5432/taskshare
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_EXPIRES_IN: 7d
+    ports:
+      - "3001:3000"
+    networks:
+      - taskshare-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - production
+
+  # PgAdmin para gerenciar o banco (desenvolvimento)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: taskshare-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@taskshare.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - taskshare-network
+    depends_on:
+      - postgres
+    profiles:
+      - development
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  taskshare-network:
+    driver: bridge

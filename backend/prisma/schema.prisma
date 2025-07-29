@@ -1,15 +1,136 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String // Hash da senha
+  avatar    String? // URL do avatar (futuro)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  ownedLists    TaskList[]     @relation("ListOwner")
+  sharedLists   ListShare[]
+  comments      Comment[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model TaskList {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  color       String?  @default("#3B82F6") // Cor da lista
+  isArchived  Boolean  @default(false)
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  owner  User        @relation("ListOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  tasks  Task[]
+  shares ListShare[]
+
+  @@map("task_lists")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  completed   Boolean   @default(false)
+  priority    Priority  @default(MEDIUM)
+  dueDate     DateTime?
+  listId      String
+  position    Int       @default(0) // Para ordenação
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relacionamentos
+  list     TaskList  @relation(fields: [listId], references: [id], onDelete: Cascade)
+  comments Comment[]
+
+  @@map("tasks")
+}
+
+model ListShare {
+  id         String          @id @default(cuid())
+  listId     String
+  userId     String
+  permission SharePermission @default(READ)
+  createdAt  DateTime        @default(now())
+
+  // Relacionamentos
+  list TaskList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  user User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Índice único para evitar duplicatas
+  @@unique([listId, userId])
+  @@map("list_shares")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  taskId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // Relacionamentos
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum SharePermission {
+  READ
+  WRITE
+}
+
+// ======================
+// ÍNDICES PARA PERFORMANCE
+// ======================
+// Os índices são criados automaticamente para:
+// - Primary keys (@id)
+// - Foreign keys (fields nas relations)
+// - Unique fields (@unique)
+
+// Índices adicionais personalizados
+// @@index([ownerId, createdAt]) // Para buscar listas por owner ordenadas por data
+// @@index([listId, position])   // Para ordenação de tarefas
+// @@index([taskId, createdAt])  // Para comentários ordenados por data
