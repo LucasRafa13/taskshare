@@ -2,17 +2,12 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import authRoutes from "@/routes/auth.routes"; // ✅ ADICIONADO
 
 const app = express();
 
-// ======================
-// MIDDLEWARES GLOBAIS
-// ======================
-
-// Segurança
 app.use(helmet());
 
-// CORS
 app.use(
   cors({
     origin: process.env.ALLOWED_ORIGINS?.split(",") || [
@@ -23,18 +18,14 @@ app.use(
   }),
 );
 
-// Logs HTTP
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
-// Parse JSON
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
-// ======================
-// ROTAS
-// ======================
+// ✅ ROTAS REGISTRADAS AQUI
+app.use("/api/auth", authRoutes);
 
-// Health Check
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
     status: "OK",
@@ -45,7 +36,6 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
-// Rota de boas-vindas
 app.get("/api", (_req, res) => {
   res.status(200).json({
     message: "🎯 Bem-vindo à TaskShare API!",
@@ -60,18 +50,12 @@ app.get("/api", (_req, res) => {
   });
 });
 
-// ======================
-// TRATAMENTO DE ERROS
-// ======================
-
-// Middleware para rotas não encontradas
 app.use((_req, _res, next) => {
   const error = new Error("Rota não encontrada");
   (error as any).status = 404;
   next(error);
 });
 
-// Error handler global
 app.use(
   (
     error: any,
