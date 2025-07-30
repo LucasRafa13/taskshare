@@ -7,6 +7,7 @@ import { checkDatabaseHealth } from "@/config/database";
 import authRoutes from "@/routes/auth.routes";
 import listRoutes from "@/routes/list.routes";
 import taskRoutes from "@/routes/task.routes";
+import commentRoutes from "@/routes/comment.routes";
 import { handleError } from "@/middleware/error.middleware";
 
 const app = express();
@@ -82,6 +83,12 @@ app.get("/api", (_req, res) => {
         delete: "DELETE /api/task/:id",
         reorder: "PATCH /api/list/:listId/reorder",
       },
+      comments: {
+        getByTask: "GET /api/task/:taskId/comments",
+        create: "POST /api/task/:taskId/comments",
+        update: "PUT /api/comment/:id",
+        delete: "DELETE /api/comment/:id",
+      },
     },
     documentation: "Em breve...",
     status: "Funcional ✅",
@@ -92,6 +99,7 @@ app.get("/api", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/lists", listRoutes);
 app.use("/api", taskRoutes);
+app.use("/api", commentRoutes);
 
 // Middleware para rotas não encontradas
 app.use((_req, _res, next) => {
