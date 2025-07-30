@@ -1,18 +1,36 @@
-import dotenv from "dotenv";
-
-// Carregar variáveis de ambiente primeiro
-dotenv.config();
-
+import { config, validateConfig } from "./config/env";
+import { connectDatabase } from "./config/database";
 import app from "./app";
 
-const PORT = process.env.PORT || 3000;
+async function startServer(): Promise<void> {
+  try {
+    validateConfig();
 
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
-  console.log(`📚 Documentação: http://localhost:${PORT}/api`);
-  console.log(`🔍 Health Check: http://localhost:${PORT}/api/health`);
-  console.log(
-    `🐘 Banco de dados: ${process.env.DATABASE_URL ? "✅ Conectado" : "❌ Não configurado"}`,
-  );
-});
+    await connectDatabase();
+
+    const server = app.listen(config.app.port, () => {
+      console.log(`🚀 Servidor rodando na porta ${config.app.port}`);
+      console.log(`📚 Documentação: http://localhost:${config.app.port}/api`);
+      console.log(
+        `🔍 Health Check: http://localhost:${config.app.port}/api/health`,
+      );
+      console.log(`🌍 Ambiente: ${config.app.nodeEnv}`);
+    });
+
+    const shutdown = (signal: string) => {
+      console.log(`\n📴 Recebido sinal ${signal}, encerrando servidor...`);
+      server.close(() => {
+        console.log("✅ Servidor encerrado com sucesso!");
+        process.exit(0);
+      });
+    };
+
+    process.on("SIGTERM", () => shutdown("SIGTERM"));
+    process.on("SIGINT", () => shutdown("SIGINT"));
+  } catch (error) {
+    console.error("❌ Erro ao inicializar servidor:", error);
+    process.exit(1);
+  }
+}
+
+startServer();
