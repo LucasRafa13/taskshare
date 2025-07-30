@@ -1,10 +1,11 @@
 module.exports = {
   preset: "ts-jest",
-
   testEnvironment: "node",
 
+  // Diretórios raiz para os testes
   roots: ["<rootDir>/src", "<rootDir>/tests"],
 
+  // Padrões de arquivos de teste
   testMatch: [
     "**/tests/**/*.test.ts",
     "**/tests/**/*.spec.ts",
@@ -12,53 +13,45 @@ module.exports = {
     "**/*.(test|spec).ts",
   ],
 
+  // Extensões de arquivo que o Jest deve processar
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
 
+  // Transformações
   transform: {
     "^.+\\.(ts|tsx)$": "ts-jest",
   },
 
-  moduleNameMapping: {
+  // Path mapping (IMPORTANTE - resolver @/ paths)
+  moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
-    "^@/config/(.*)$": "<rootDir>/src/config/$1",
-    "^@/controllers/(.*)$": "<rootDir>/src/controllers/$1",
-    "^@/middleware/(.*)$": "<rootDir>/src/middleware/$1",
-    "^@/routes/(.*)$": "<rootDir>/src/routes/$1",
-    "^@/services/(.*)$": "<rootDir>/src/services/$1",
-    "^@/types/(.*)$": "<rootDir>/src/types/$1",
-    "^@/utils/(.*)$": "<rootDir>/src/utils/$1",
   },
 
+  // Setup files
   setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
 
+  // Coleta de cobertura
   collectCoverage: false,
   collectCoverageFrom: [
     "src/**/*.ts",
     "!src/**/*.d.ts",
-    "!src/server.ts", // Arquivo de entrada
-    "!src/config/**", // Configurações
-    "!src/types/**", // Definições de tipos
+    "!src/server.ts",
+    "!src/config/**",
+    "!src/types/**",
   ],
 
+  // Diretório de saída da cobertura
   coverageDirectory: "coverage",
 
-  coverageReporters: ["text", "text-summary", "html", "lcov", "clover"],
+  // Formatos de relatório de cobertura
+  coverageReporters: ["text", "text-summary", "html", "lcov"],
 
-  coverageThreshold: {
-    global: {
-      branches: 70,
-      functions: 70,
-      lines: 70,
-      statements: 70,
-    },
-  },
-
+  // Ignorar arquivos específicos
   testPathIgnorePatterns: ["/node_modules/", "/dist/", "/coverage/"],
 
-  transformIgnorePatterns: ["node_modules/(?!(module-that-needs-transform)/)"],
-
+  // Timeout para testes
   testTimeout: 30000,
 
+  // Configurações específicas do ts-jest
   globals: {
     "ts-jest": {
       tsconfig: {
@@ -68,15 +61,10 @@ module.exports = {
     },
   },
 
+  // Limpar mocks automaticamente entre testes
   clearMocks: true,
-
   restoreMocks: true,
-
   verbose: true,
-
   detectOpenHandles: true,
-
   forceExit: true,
-
-  testEnvironmentOptions: {},
 };

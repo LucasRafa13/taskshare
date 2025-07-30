@@ -11,7 +11,7 @@ Backend da aplicação TaskShare - Sistema de gerenciamento colaborativo de tare
 - **Banco de dados:** PostgreSQL
 - **Autenticação:** JWT
 - **Containerização:** Docker + Docker Compose
-- **Testes:** Jest
+- **Testes:** Mocha + Chai + Supertest
 - **Linting:** ESLint + Prettier
 
 ## 🚀 Funcionalidades
@@ -162,10 +162,8 @@ docker compose down -v
 npm test
 
 # Testes em modo watch
-npm run test:watch
+npm run test
 
-# Cobertura de testes
-npm run test:coverage
 ```
 
 ## 📊 Banco de Dados
@@ -201,7 +199,7 @@ npx prisma db push
 npm run dev          # Desenvolvimento com hot reload
 npm run build        # Build para produção
 npm run start        # Iniciar produção
-npm test             # Executar testes
+npm run test             # Executar testes
 npm run lint         # Verificar código
 npm run format       # Formatar código
 ```
