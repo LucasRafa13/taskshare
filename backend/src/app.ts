@@ -6,6 +6,7 @@ import { config } from "@/config/env";
 import { checkDatabaseHealth } from "@/config/database";
 import authRoutes from "@/routes/auth.routes";
 import listRoutes from "@/routes/list.routes";
+import taskRoutes from "@/routes/task.routes";
 import { handleError } from "@/middleware/error.middleware";
 
 const app = express();
@@ -72,7 +73,15 @@ app.get("/api", (_req, res) => {
         share: "POST /api/lists/:id/share",
         unshare: "DELETE /api/lists/:id/share/:userId",
       },
-      tasks: "Em breve...",
+      tasks: {
+        getByList: "GET /api/list/:listId/tasks",
+        create: "POST /api/list/:listId/tasks",
+        getById: "GET /api/task/:id",
+        update: "PUT /api/task/:id",
+        toggle: "PATCH /api/task/:id/toggle",
+        delete: "DELETE /api/task/:id",
+        reorder: "PATCH /api/list/:listId/reorder",
+      },
     },
     documentation: "Em breve...",
     status: "Funcional ✅",
@@ -82,6 +91,7 @@ app.get("/api", (_req, res) => {
 // Registrar rotas
 app.use("/api/auth", authRoutes);
 app.use("/api/lists", listRoutes);
+app.use("/api", taskRoutes);
 
 // Middleware para rotas não encontradas
 app.use((_req, _res, next) => {
