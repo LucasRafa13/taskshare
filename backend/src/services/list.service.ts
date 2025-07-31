@@ -3,12 +3,12 @@ import {
   CreateListRequest,
   UpdateListRequest,
   ShareListRequest,
-  ListResponse,
+  TaskList,
 } from "@/types/list.types";
 import { AppError } from "@/middleware/error.middleware";
 
 export class ListService {
-  async create(userId: string, data: CreateListRequest): Promise<ListResponse> {
+  async create(userId: string, data: CreateListRequest): Promise<TaskList> {
     const list = await prisma.taskList.create({
       data: {
         title: data.title,
@@ -30,17 +30,18 @@ export class ListService {
       id: list.id,
       title: list.title,
       description: list.description ?? undefined,
-      color: list.color ?? "#3B82F6",
+      color: list.color || "#3B82F6",
       isArchived: list.isArchived,
       ownerId: list.ownerId,
       createdAt: list.createdAt.toISOString(),
       updatedAt: list.updatedAt.toISOString(),
       owner: list.owner,
       _count: list._count,
+      permission: "OWNER",
     };
   }
 
-  async getAll(userId: string) {
+  async getAll(userId: string): Promise<TaskList[]> {
     const lists = await prisma.taskList.findMany({
       where: {
         OR: [{ ownerId: userId }, { shares: { some: { userId } } }],
@@ -65,7 +66,7 @@ export class ListService {
       id: list.id,
       title: list.title,
       description: list.description ?? undefined,
-      color: list.color,
+      color: list.color || "#3B82F6",
       isArchived: list.isArchived,
       ownerId: list.ownerId,
       createdAt: list.createdAt.toISOString(),
@@ -79,7 +80,7 @@ export class ListService {
     }));
   }
 
-  async getById(listId: string, userId: string) {
+  async getById(listId: string, userId: string): Promise<TaskList> {
     const list = await prisma.taskList.findFirst({
       where: {
         id: listId,
@@ -114,7 +115,7 @@ export class ListService {
       id: list.id,
       title: list.title,
       description: list.description ?? undefined,
-      color: list.color,
+      color: list.color || "#3B82F6",
       isArchived: list.isArchived,
       ownerId: list.ownerId,
       createdAt: list.createdAt.toISOString(),
@@ -132,7 +133,11 @@ export class ListService {
     };
   }
 
-  async update(listId: string, userId: string, data: UpdateListRequest) {
+  async update(
+    listId: string,
+    userId: string,
+    data: UpdateListRequest,
+  ): Promise<TaskList> {
     await this.checkPermission(listId, userId, "WRITE");
 
     const updated = await prisma.taskList.update({
@@ -158,13 +163,14 @@ export class ListService {
       id: updated.id,
       title: updated.title,
       description: updated.description ?? undefined,
-      color: updated.color,
+      color: updated.color || "#3B82F6",
       isArchived: updated.isArchived,
       ownerId: updated.ownerId,
       createdAt: updated.createdAt.toISOString(),
       updatedAt: updated.updatedAt.toISOString(),
       owner: updated.owner,
       _count: updated._count,
+      permission: "OWNER",
     };
   }
 
@@ -178,6 +184,10 @@ export class ListService {
 
   async share(listId: string, userId: string, data: ShareListRequest) {
     await this.checkOwnership(listId, userId);
+
+    if (!data.userId) {
+      throw new AppError("ID do usuário de destino é obrigatório", 400);
+    }
 
     if (data.userId === userId) {
       throw new AppError("Você não pode compartilhar com você mesmo", 400);

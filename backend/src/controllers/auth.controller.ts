@@ -24,6 +24,22 @@ export class AuthController {
     }
   }
 
+  async getUserByEmail(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | void> {
+    try {
+      const { email } = req.params;
+      if (!email) return next(new Error("Parâmetro 'email' é obrigatório"));
+
+      const user = await authService.getUserByEmail(decodeURIComponent(email));
+      return successResponse(res, user);
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   async login(
     req: AuthRequest,
     res: Response,

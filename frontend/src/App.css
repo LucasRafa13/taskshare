@@ -1,0 +1,120 @@
+
+/* Loading states */
+.loading-skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
+}
+
+.loading-skeleton-text {
+  @apply h-4 bg-gray-200 rounded animate-pulse;
+}
+
+.loading-skeleton-avatar {
+  @apply w-10 h-10 bg-gray-200 rounded-full animate-pulse;
+}
+
+/* Card animations */
+.card-hover {
+  @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Form styles */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.form-input {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm 
+         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+         disabled:bg-gray-50 disabled:text-gray-500;
+}
+
+.form-error {
+  @apply text-sm text-red-600;
+}
+
+/* Button variants */
+.btn-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md
+         transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+.btn-secondary {
+  @apply bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-md
+         transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500;
+}
+
+.btn-danger {
+  @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md
+         transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500;
+}
+
+.btn-ghost {
+  @apply bg-transparent hover:bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-md
+         transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500;
+}
+
+/* Task priority colors */
+.priority-low {
+  @apply text-green-600 bg-green-100;
+}
+
+.priority-medium {
+  @apply text-yellow-600 bg-yellow-100;
+}
+
+.priority-high {
+  @apply text-orange-600 bg-orange-100;
+}
+
+.priority-urgent {
+  @apply text-red-600 bg-red-100;
+}
+
+/* List colors */
+.list-color-preview {
+  @apply w-4 h-4 rounded-full border-2 border-white shadow-sm;
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl max-w-md w-full max-h-screen overflow-auto;
+}
+
+/* Dropdown */
+.dropdown-content {
+  @apply absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10;
+}
+
+/* Avatar group */
+.avatar-group {
+  @apply flex -space-x-2;
+}
+
+.avatar-group .avatar {
+  @apply ring-2 ring-white;
+}
+
+/* Empty state */
+.empty-state {
+  @apply text-center py-12;
+}
+
+.empty-state-icon {
+  @apply w-12 h-12 mx-auto text-gray-400 mb-4;
+}
+
+.empty-state-title {
+  @apply text-lg font-medium text-gray-900 mb-2;
+}
+
+.empty-state-description {
+  @apply text-gray-500 mb-6;
+}

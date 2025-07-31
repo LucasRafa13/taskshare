@@ -99,6 +99,19 @@ export class AuthService {
     };
   }
 
+  async getUserByEmail(email: string) {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { id: true, name: true, email: true },
+    });
+
+    if (!user) {
+      throw new AppError("Usuário não encontrado", 404);
+    }
+
+    return user;
+  }
+
   async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
     const decoded = verifyToken(refreshToken);
 

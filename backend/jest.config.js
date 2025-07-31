@@ -50,6 +50,7 @@ module.exports = {
 
   // Timeout para testes
   testTimeout: 30000,
+  
 
   // Configurações específicas do ts-jest
   globals: {

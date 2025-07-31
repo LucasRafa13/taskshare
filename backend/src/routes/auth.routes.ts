@@ -15,6 +15,9 @@ router.post(
 
 router.post("/login", validateBody(authSchemas.login), authController.login);
 
+router.get("/email/:email", authController.getUserByEmail);
+
+
 router.post(
   "/refresh",
   validateBody(authSchemas.refreshToken),

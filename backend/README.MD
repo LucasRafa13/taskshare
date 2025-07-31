@@ -133,11 +133,12 @@ Ver detalhes completos em `prisma/schema.prisma`
 ### Comandos úteis:
 
 ```bash
+
+# Subir aplicação inteira de uma vez ( Hot Reload )
+docker compose up app-dev
+
 # Subir apenas o banco
 docker compose up postgres -d
-
-# Desenvolvimento com hot reload
-docker compose up app-dev
 
 # Produção
 docker compose --profile production up app-prod
@@ -293,6 +294,3 @@ Desenvolvido como desafio técnico para demonstrar habilidades em:
 - Arquitetura REST
 
 ---
-
-**Status atual:** ✅ Base configurada e funcionando  
-**Próximos passos:** Implementar autenticação e CRUD básico
